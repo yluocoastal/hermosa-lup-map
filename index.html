@@ -18,7 +18,7 @@
             height: 1202px;
         }
         </style>
-        <title></title>
+        <title>Hermosa Beach LUP Map</title>
     </head>
     <body>
         <div id="map">
@@ -41,7 +41,7 @@
         <script>
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[33.84530459576214,-118.41363702097048],[33.881419237319676,-118.38256936744337]]);
+        }).fitBounds([[33.830928795252404,-118.42771302891526],[33.89725783632432,-118.3706524955535]]);
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
@@ -117,6 +117,16 @@
                 popup._contentNode.classList.remove('media');
             }
         }
+        var title = new L.Control({'position':'topright'});
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+        title.update = function () {
+            this._div.innerHTML = '<h2>Hermosa Beach LUP Map</h2>';
+        };
+        title.addTo(map);
         var zoomControl = L.control.zoom({
             position: 'topleft'
         }).addTo(map);
@@ -136,13 +146,13 @@
         function pop_LandUse_0(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
-                        <td colspan="2"><strong>AIN</strong><br />' + (feature.properties['AIN'] !== null ? autolinker.link(String(feature.properties['AIN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2"><strong>Assessor\'s Parcel Number</strong><br />' + (feature.properties['AIN'] !== null ? autolinker.link(String(feature.properties['AIN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <td class="visible-with-data" id="SitusDirec" colspan="2"><strong>SitusDirec</strong><br />' + (feature.properties['SitusDirec'] !== null ? autolinker.link(String(feature.properties['SitusDirec']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <td colspan="2"><strong>LandUse</strong><br />' + (feature.properties['LandUse'] !== null ? autolinker.link(String(feature.properties['LandUse']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2"><strong>Land Use Designation</strong><br />' + (feature.properties['LandUse'] !== null ? autolinker.link(String(feature.properties['LandUse']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
@@ -152,15 +162,6 @@
 			layer.bindPopup(content, { maxHeight: 400 });
         }
 
-        var pattern_LandUse_0_0 = new L.StripePattern({
-            weight: 0.3,
-            spaceWeight: 2.0,
-            color: '#eaab22',
-            opacity: 1.0,
-            spaceOpacity: 0,
-            angle: 315
-        });
-        pattern_LandUse_0_0.addTo(map);
         function style_LandUse_0_0(feature) {
             switch(String(feature.properties['LandUse'])) {
                 default:
@@ -226,9 +227,15 @@
                 case 'Commercial Recreation':
                     return {
                 pane: 'pane_LandUse_0',
-                stroke: false,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
                 fillOpacity: 1,
-                fillPattern: pattern_LandUse_0_0,
+                fillColor: 'rgba(174,75,59,1.0)',
                 interactive: true,
             }
                     break;
@@ -243,7 +250,22 @@
                 weight: 1.0, 
                 fill: true,
                 fillOpacity: 1,
-                fillColor: 'rgba(183,72,75,1.0)',
+                fillColor: 'rgba(224,50,55,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Check LUP Map':
+                    return {
+                pane: 'pane_LandUse_0',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(175,167,156,1.0)',
                 interactive: true,
             }
                     break;
