@@ -13,9 +13,11 @@
         <link rel="stylesheet" href="css/leaflet.photon.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
         <style>
-        #map {
-            width: 2168px;
-            height: 1202px;
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
         }
         </style>
         <title>Hermosa Beach LUP Map</title>
@@ -41,7 +43,7 @@
         <script>
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[33.84461481884272,-118.4120707297516],[33.87777901126648,-118.38354199003935]]);
+        }).fitBounds([[33.84759510431727,-118.41157303738692],[33.88075919051916,-118.38304347961946]]);
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
@@ -217,21 +219,6 @@
 
         function style_LandUse_1_0(feature) {
             switch(String(feature.properties['LandUse'])) {
-                default:
-                    return {
-                pane: 'pane_LandUse_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,1.0)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(224,224,224,1.0)',
-                interactive: true,
-            }
-                    break;
                 case 'Low Density':
                     return {
                 pane: 'pane_LandUse_1',
@@ -468,6 +455,70 @@
                 last.style.display = "none";
             }
         });
+        var overlaysTree = [
+            {label: '<img src="legend/Roads_2.png" /> Roads', layer: layer_Roads_2},
+            {label: 'Land Use<br /><table><tr><td style="text-align: center;"><img src="legend/LandUse_1_LowDensity0.png" /></td><td>Low Density</td></tr><tr><td style="text-align: center;"><img src="legend/LandUse_1_MediumDensity1.png" /></td><td>Medium Density</td></tr><tr><td style="text-align: center;"><img src="legend/LandUse_1_HighDensity2.png" /></td><td>High Density</td></tr><tr><td style="text-align: center;"><img src="legend/LandUse_1_CommercialRecreation3.png" /></td><td>Commercial Recreation</td></tr><tr><td style="text-align: center;"><img src="legend/LandUse_1_GeneralCommercial4.png" /></td><td>General Commercial</td></tr><tr><td style="text-align: center;"><img src="legend/LandUse_1_AmbiguousCheckLUPMap5.png" /></td><td>Ambiguous - Check LUP Map</td></tr></table>', layer: layer_LandUse_1},
+            {label: "OSM Standard", layer: layer_OSMStandard_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 650;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
         setBounds();
         resetLabels([layer_Roads_2]);
         map.on("zoomend", function(){
@@ -479,6 +530,6 @@
         map.on("layerremove", function(){
             resetLabels([layer_Roads_2]);
         });
-        </script>
+        </script>        
     </body>
 </html>
